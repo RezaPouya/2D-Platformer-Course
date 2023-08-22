@@ -23,17 +23,18 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	var moveVector = setInitialmoveVector()
+	var moveVector = getInitialmoveVector()
 	
 	velocity.x += moveVector.x * horizontalAcceleration * delta
+	
 	if (moveVector.x == 0):
 		velocity.x = lerp(0, velocity.x, pow(2, -50 * delta))
 		
 	velocity.x += moveVector.x * horizontalAcceleration * delta
 	
 	# if we dont have any input in x , we gonna decelarate
-	if(velocity.x == 0):
 		# velocity.x = lerp(velocity.x , 0 , 0.1)
+	if(velocity.x == 0):
 		velocity.x = lerp( 0 , velocity.x , pow(2 , -50 * delta)) # frame rate independent lerp
 	
 	# this is gonna prevent us to go above speed limit 
@@ -49,7 +50,7 @@ func _process(delta):
 		
 	velocity = move_and_slide(velocity, Vector2.UP)
 	
-func setInitialmoveVector():
+func getInitialmoveVector():
 	var moveVector = Vector2.ZERO
 	moveVector.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
 	moveVector.y = -1 if Input.is_action_just_pressed("jump") else 0
