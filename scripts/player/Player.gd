@@ -40,16 +40,33 @@ func _process(delta):
 	# this is gonna prevent us to go above speed limit 
 	velocity.x = clamp(velocity.x , -maxHorizontalSpeed , maxHorizontalSpeed)
 	
-	if (moveVector.y < 0 && is_on_floor()):
+	if (moveVector.y < 0 && (is_on_floor() || !$coyoteTimer.is_stopped() || hasDoubleJump)):
 		velocity.y = moveVector.y * jumpSpeed
+		if(!is_on_floor() && $coyoteTimer.is_stopped()):
+			hasDoubleJump = false
+		$coyoteTimer.stop()
+		
+	# for multiple jump 
+#	if (moveVector.y < 0 && (is_on_floor() || !$coyoteTimer.stop() || hasDoubleJump)):
+#		velocity.y = moveVector.y * jumpSpeed
+#		if(!is_on_floor() && $coyoteTimer.stop()):
+#			hasDoubleJump = false
+#		$coyoteTimer.stop()
 		
 	if (velocity.y < 0 && !Input.is_action_pressed("jump")):
 		velocity.y += gravity * jumpTerminationMultiplier * delta
 	else:
 		velocity.y += gravity * delta
 		
+	var wasOnFloor = is_on_floor()
 	velocity = move_and_slide(velocity, Vector2.UP)
 	
+	if(wasOnFloor && !is_on_floor()):
+		$coyoteTimer.start()
+		
+	if(is_on_floor()):
+		hasDoubleJump = true
+		
 	update_animation()
 	
 func getInitialmoveVector():
